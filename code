@@ -1,0 +1,300 @@
+from tkinter import *
+from tkinter.messagebox import showinfo, showerror
+import smtplib
+import pyttsx3
+import os
+import gtts 
+import speech_recognition as sr 
+from pygame import mixer
+
+
+
+
+engine = pyttsx3.init() 
+engine.setProperty('rate',120)
+
+voices = engine.getProperty('voices')
+
+engine.setProperty('voice', voices[1].id)
+
+
+
+ 
+class Login(Tk):
+    '''Here the Login window appears and receives data from:
+        - Email account.
+        - Password.
+        Furthermore, tries to log in to your gmail account.'''
+    
+    
+    def __init__(self):
+        try:
+            self.gmail = smtplib.SMTP("smtp.gmail.com", 587)
+        except Exception as e:
+            showerror("Fatal Error", str(e))
+            exit()
+        Tk.__init__(self)
+        
+        #photo = self.PhotoImage(file = 'C:/Users/karan/Downloads/FireShot/microphone.png').subsample(15,15)
+        #self.geometry("268x157")
+        self.resizable(0,0)
+        self.title("e-Sender")
+        self.config(bg="black")
+        
+
+            
+        def aclick( event ):
+            
+            mixer.init()
+            
+            engine.say("Your Gmail Account")
+            engine.runAndWait()
+            engine.stop()
+            r = sr.Recognizer()
+            r.pause_threshhold = 2.0
+            r.dynamic_energy_threshold = True
+            
+            with sr.Microphone() as source:
+                
+                try:
+                    audio = r.listen(source , timeout = 6)
+                    msg = str(r.recognize_google(audio))
+                    m2 = msg.replace(" ","")
+                    self.my_email.focus()
+                    self.my_email.insert(0,m2)
+                except :
+                    engine.say("could not recognize voice")
+                    engine.runAndWait()
+                    engine.stop()
+                    
+        def pclick( event ):
+            
+            mixer.init()
+            
+            engine.say("your password")
+            engine.runAndWait()
+            engine.stop()
+            r=sr.Recognizer()
+            r.pause_threshhold = 2.0
+            r.dynamic_energy_threshold = True
+            
+            with sr.Microphone() as source:
+                
+                try:
+                    audio = r.listen(source , timeout = 4)
+                    msg = str(r.recognize_google(audio))
+                    m2 = msg.replace(" ","")
+                    self.my_passw.focus()
+                    self.my_passw.insert(0,m2)
+                except :
+                    engine.say("could not recognize voice")
+                    engine.runAndWait()
+                    engine.stop()
+                    
+                    
+        def callback(event):
+            self.email_button.focus_set()
+            
+            
+        
+        
+        me = StringVar()
+        mp = StringVar()
+        
+        
+        
+        Label(self, text="Your Gmail account:", bg="black", fg="green").grid(row = 0, column = 0, sticky=W)
+        self.my_email = Entry(self, textvariable=me, width = 25)
+        self.my_email.focus_set()
+        #self.my_email.bind("<FocusIn>" , mouseClick)
+        self.my_email.bind("<FocusIn>" , aclick)
+        #self.my_email.bind("<Return>", self.my_passw)
+        self.my_email.grid(row = 0, column = 1)
+    
+        Label(self, text="Your Password:", bg="black", fg="green").grid(row = 1, column = 0, sticky=W)
+        self.my_passw = Entry(self, textvariable=mp, width = 25,show = '*')
+        self.my_passw.bind("<FocusIn>" , pclick)
+        #self.my_passw.bind("<Return>" , self.login_gmail)
+        self.my_passw.bind("<Return>" , callback)
+        self.my_passw.grid(row = 1, column = 1)
+ 
+        self.email_button = Button(self, text="Enter", command=self.login_gmail, bg="black", fg="green")
+        self.email_button.bind("<Return>", self.login_gmail)
+        self.email_button.grid(row = 2, column = 0, sticky=NSEW)
+ 
+        salir = Button(self, text="Exit", command=self.quit, bg="black", fg="red")
+        salir.grid(row = 2, column = 1, sticky=NSEW)
+        
+        
+        # searchbtn = Button(self, text ='voice' ,command =sclick, bd = 0, activebackground = '#c1bfbf',overrelief = 'groove', relief = 'sunken')
+        #searchbtn.grid(row = 0,column = 2)
+        
+        
+ 
+    def login_gmail(self , event = None):
+        account = self.my_email.get()
+        self.password = self.my_passw.get()
+        self.gmail.ehlo()
+        self.gmail.starttls()
+        try:
+            self.gmail.login(account, self.password)
+            engine.say("Login Succesfull")
+            engine.runAndWait()
+            engine.stop()
+        except:
+            engine.say("Login Unsuccessfull")
+            engine.runAndWait()
+            engine.stop()
+            exit()
+            
+        gmail = self.gmail
+        newEmail(gmail, account)
+        #self.withdraw()
+        
+        self.destroy()
+ 
+class newEmail(Login):
+    ''' Now we can create a new email, specifying:
+            - to
+            - subject
+            - message'''
+    def __init__(self, gmail, account):
+        Tk.__init__(self)
+        self.resizable(0,0)
+        self.title("New Email")
+        self.config(bg="black")
+        self.gmail = gmail
+        self.email = account
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        def tclick( event ):
+            
+            mixer.init()
+            
+            engine.say("send this mail to")
+            engine.runAndWait()
+            engine.stop()
+            r=sr.Recognizer()
+            r.pause_threshhold = 2.0
+            r.dynamic_energy_threshold = True
+            
+            with sr.Microphone() as source:
+                
+                try:
+                    audio = r.listen(source , timeout = 5)
+                    msg = str(r.recognize_google(audio))
+                    m2 = msg.replace(" ","")
+                    self.email_to.focus()
+                    self.email_to.insert(0,m2)
+                except :
+                    engine.say("could not recognize voice")
+                    engine.runAndWait()
+                    engine.stop()
+                    
+                    
+        def subclick( event ):
+            
+            mixer.init()
+            
+            engine.say("SUBJECt")
+            engine.runAndWait()
+            engine.stop()
+            r=sr.Recognizer()
+            r.pause_threshold = 2.0
+            r.dynamic_energy_threshold = True
+            
+            with sr.Microphone() as src:
+                
+                try:
+                    audio = r.listen(src , timeout = 4)
+                    msg = str(r.recognize_google(audio))
+                    m2 = msg.replace(" ","")
+                    self.email_subject.focus()
+                    self.email_subject.insert(0,m2)
+                except :
+                    engine.say("could not recognize voice")
+                    engine.runAndWait()
+                    engine.stop()
+        
+        def bclick( event ):
+            
+            mixer.init()
+            
+            engine.say("Message")
+            engine.runAndWait()
+            engine.stop()
+            r=sr.Recognizer()
+            r.pause_threshold = 2.0
+            r.dynamic_energy_threshold = True
+            
+            with sr.Microphone() as src:
+                
+                try:
+                    audio = r.listen(src , timeout = 15)
+                    msg = str(r.recognize_google(audio))
+                    self.email_msg.focus()
+                    self.email_msg.insert(0,msg)
+                except :
+                    engine.say("could not recognize voice")
+                    engine.runAndWait()
+                    engine.stop()
+        
+        def callback2 (event):
+            self.email_button.focus_set()
+        
+    
+        et = StringVar()
+        es = StringVar()
+        em = StringVar()
+        
+        Label(self, text="From: %s" % account, bg="black", fg="orange").grid(row=0, column=0, sticky=NSEW)
+        
+        Label(self, text="To:", bg="black", fg="green").grid(row = 1, column = 0, sticky=W)
+        self.email_to = Entry(self, textvariable=et, width = 25)
+        self.email_to.focus_set()
+        self.email_to.bind("<FocusIn>", tclick)
+        self.email_to.grid(row = 1, column = 1, sticky=E)
+    
+        Label(self, text="Subject:", bg="black", fg="green").grid(row = 2, column = 0, sticky=W)
+        self.email_subject = Entry(self, textvariable=es, width = 25)
+        self.email_subject.bind("<FocusIn>", subclick)
+        self.email_subject.grid(row = 2, column = 1, sticky=E)
+    
+        Label(self, text="Your Message:", bg="black", fg="green").grid(row = 3, column = 0, sticky=W)
+        self.email_msg = Entry(self, textvariable = em ,width = 25)
+        self.email_msg.bind("<FocusIn>", bclick )
+        self.email_msg.bind("<Return>" , callback2)
+        self.email_msg.grid(row = 3, column = 1, sticky=E , padx=5 , pady = 5, ipady = 10)
+    
+        self.email_button = Button(self, text="Send", command=self.sendEmail, bg="black", fg="green")
+        self.email_button.bind("<Return>", self.sendEmail)
+        self.email_button.grid(row = 4, column = 0, sticky=NSEW)
+        
+        salir = Button(self, text="Exit", command=self.quit, bg="black", fg="red")
+        salir.grid(row = 4, column = 1, sticky=NSEW)
+ 
+    def sendEmail(self,event = None):
+        self.to = self.email_to.get()
+        self.subject = self.email_subject.get()
+        self.msg = self.email_msg.get()
+        headers = "From: %s\nTo: %s\nSubject: %s\n\n" % (self.email, self.to, self.subject)
+        body = str(headers + self.msg)
+        try:
+            self.gmail.sendmail(self.email, self.to, body)
+            engine.say(" Email sent successfully , BYEBYE ")
+            engine.runAndWait()
+            
+            self.destroy()
+        except Exception as e:
+            showerror("Error", str(e))
+            exit()
+ 
+L = Login()
+L.mainloop()
